@@ -1,0 +1,90 @@
+CREATING CLUSTER AND BUCKET  USING SHELL SCRIPT
+
+    sudo -i 
+    sudo yum update -y 
+    vim kops.sh
+  
+aws configure
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+wget https://github.com/kubernetes/kops/releases/download/v1.25.0/kops-linux-amd64
+chmod +x kops-linux-amd64 kubectl
+mv kubectl /usr/local/bin/kubectl
+mv kops-linux-amd64 /usr/local/bin/kops
+aws s3api create-bucket --bucket rahamssshaik19.k8s.local --region us-east-1
+aws s3api put-bucket-versioning --bucket rahamssshaik19.k8s.local --region us-east-1 --versioning-configuration Status=Enabled
+export KOPS_STATE_STORE=s3://rahamssshaik19.k8s.local
+kops create cluster --name clouds.k8s.local --zones us-east-1a --master-count=1 --master-size t2.medium --node-count=2 --node-size t2.micro
+kops update cluster --name clouds.k8s.local --yes --admin
+
+   vim .bashrc
+    
+# .bashrc
+
+# User specific aliases and functions
+
+alias rm='rm -i'
+alias cp='cp -i'
+alias mv='mv -i'
+
+# Source global definitions
+if [ -f /etc/bashrc ]; then
+        . /etc/bashrc
+fi
+export PATH=$PATH:/usr/local/bin/
+
+    source .bashrc
+    sh kops.sh
+        AWS Access Key ID [None]:
+        AWS Secret Access Key [None]: 
+        Default region name [None]: 
+        Default output format
+    
+   cat kops.sh
+   export KOPS_STATE_STORE=s3://<bucket name>
+   kops validate cluster --wait 10m
+    kops get cluster
+    kops edit cluster <clustername>
+    kops edit ig --name=clouds.k8s.local nodes-us-east-1a
+            max size=.....
+            min size=....
+    kops update cluster --name clouds.k8s.local --yes
+    kops rolling-update cluster
+    kops edit ig --name=clouds.k8s.local master-us-east-1a
+            max size=.....
+            min size=....
+    kops update cluster --name clouds.k8s.local --yes
+    kops rolling-update cluster
+    kubectl get no 
+    kops get cluster
+    kops delete cluster --name <clustername>  --yes
+======================================================================
+
+NAME SPACE:
+
+  
+     kubectl get ns 
+     kubectl get pod -n kube-system
+     kubectl run pod1 --image nginx
+     kubectl describe pod pod1
+     kubectl get pod
+     kubectl get pod -o wide
+     kubectl create ns dev
+     kubectl get pod
+     kubectl get ns
+     kubectl config view --minify
+     kubectl config view --minify|grep -i namespace
+     kubectl config set-context --current --namespace=dev
+     
+     kubectl get ns
+     kubectl config view --minify|grep-i  namespace
+     kubectl run dev1 --image nginx
+     kubectl run dev2 --image nginx
+     kubectl run dev3 --image nginx
+     kubectl get pod
+    kubectl create ns test
+    kubectl config set-context --current --namespace=test
+    kubectl get po -n dev
+    kubectl describe pod dev1 -n dev
+    kubectl delete ns dev
+    kubectl delete ns test
+    kubectl get ns
